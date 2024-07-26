@@ -1,0 +1,28 @@
+
+db:
+  endpoint: "PostgreSQL endpoint, ex: 127.0.0.1"
+  user: "PostgreSQL username, ex: postgres"
+  port: "PostgreSQL port, ex: 5432"
+  db: "PostgreSQL database name, ex: postgres"
+  password: "PostgreSQL database password"
+
+categories:
+  - EXCHANGE
+  - MINING
+  - GAMBLING
+  - PONZI
+  - INDIVIDUAL
+  - RANSOMWARE
+  - BET
+
+
+learning:
+
+  train_test_split:
+    prop_val: 0.3
+    prop_test: 0.3
+    max_nodes: null
+    seed: 0
+
+
+global_seed: 0
