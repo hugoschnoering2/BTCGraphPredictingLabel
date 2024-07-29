@@ -1,7 +1,10 @@
 
 import os
 import yaml
+import pickle
+import datetime
 import pandas as pd
+import plotly.graph_objects as go
 
 from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.metrics import classification_report
@@ -58,5 +61,32 @@ clf.fit(X_train.values, y_train.values)
 
 print("Predicting the labels in the test set.")
 y_pred = clf.predict(X_test.values)
-report = classification_report(y_test, y_pred)
-print(report)
+report = classification_report(y_test, y_pred, output_dict=True)
+
+
+print("Saving the model.")
+folder = "results"
+if not os.path.exists(folder):
+    os.mkdir(folder)
+folder = os.path.join(folder, "GB")
+if not os.path.exists(folder):
+    os.mkdir(folder)
+folder = os.path.join(folder, str(datetime.datetime.now()))
+os.mkdir(folder)
+with open(os.path.join(folder, "conf.yaml"), "w") as f:
+    yaml.dump(config, f, default_flow_style=False, sort_keys=False)
+with open(os.path.join(folder, "report.yaml"), "w") as f:
+    yaml.dump(report, f, default_flow_style=False, sort_keys=False)
+with open(os.path.join(folder, "model.pkl"), "wb") as f:
+    pickle.dump(clf, f)
+
+
+print("Computing the feature importances.")
+feature_importances = clf.feature_importances_
+cols = preprocessor.columns
+features_df = (pd.DataFrame({'Feature': cols, 'Importance': feature_importances})
+               .sort_values(by='Importance', ascending=False).head(10))
+fig = go.Figure(go.Bar(x=features_df["Feature"], y=features_df["Importance"], marker=dict(color="royalblue")))
+fig.update_layout(yaxis_title="Importance", template="simple_white", height=500, width=1000,
+                  font=dict( family="Computer Modern, serif"))
+fig.write_image(os.path.join(folder, "feature_importances.jpg"), format="jpeg")
